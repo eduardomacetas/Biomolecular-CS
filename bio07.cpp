@@ -5,13 +5,9 @@
 #include <math.h>
 using namespace std;
 
-long double factorial (int i) {
-  int result = 1;
-  while (i > 0) {
-    result = result * i;
-    i = i-1;
-  }
-  return result;
+char last(string a){
+    int tam=a.size()-1;
+    return a[tam];
 }
 
 float p_adenina(string a){
@@ -20,6 +16,8 @@ float p_adenina(string a){
         if(a[i]=='A')
             Adenina+=1;
     }
+    if(last(a)=='A')
+        return Adenina-1;
     return Adenina;
 }
 
@@ -29,6 +27,8 @@ float p_timina(string a){
         if(a[i]=='T')
             Timina+=1;
     }
+    if(last(a)=='T')
+        return Timina-1;
     return Timina;
 }
 
@@ -38,6 +38,8 @@ float p_citosina(string a){
         if(a[i]=='C')
             Citosina+=1;
     }
+    if(last(a)=='C')
+        return Citosina-1;
     return Citosina;
 }
 
@@ -47,6 +49,8 @@ float p_guanina(string a){
         if(a[i]=='G')
             Guanina+=1;
     }
+    if(last(a)=='G')
+        return Guanina-1;
     return Guanina;
 }
 
@@ -60,11 +64,6 @@ float p_piriminida(string a){
     return Pirimidina/a.size();
 }
 
-char last(string a){
-    int tam=a.size()-1;
-    return a[tam];
-}
-
 float markov_cont(string a, char x,char y){
     float count=0.0;
     char x1 = x;
@@ -75,21 +74,22 @@ float markov_cont(string a, char x,char y){
             count+=1;
         }
     }
-
     if(x1=='A')
         return count/p_adenina(a);
-        
-
     if(x1=='G')
         return count/p_guanina(a);
-    
-
     if(x1=='C')
-        return count/p_citosina(a);
-        
-
+        return count/p_citosina(a);        
     if(x1=='T')
         return count/p_timina(a);
+  
+}
+
+float f_principl(string a,string kat){
+    //funcion:
+    int tam=kat.size();
+    
+    
 
 }
 
@@ -111,27 +111,7 @@ void archivo()
     ficheroEntrada01.close();
     cout << "ADN es: " << cadena01 << endl;
     
-    cout<<"AAAA"<<endl;
-    cout<<markov_cont(cadena01,'A','A')<<endl;
-    cout<<markov_cont(cadena01,'A','C')<<endl;
-    cout<<markov_cont(cadena01,'A','G')<<endl;
-    cout<<markov_cont(cadena01,'A','T')<<endl;
-    cout<<"CCCC"<<endl;
-    cout<<markov_cont(cadena01,'C','A')<<endl;
-    cout<<markov_cont(cadena01,'C','C')<<endl;
-    cout<<markov_cont(cadena01,'C','G')<<endl;
-    cout<<markov_cont(cadena01,'C','T')<<endl;
-    cout<<"GGGG"<<endl;
-    cout<<markov_cont(cadena01,'G','A')<<endl;
-    cout<<markov_cont(cadena01,'G','C')<<endl;
-    cout<<markov_cont(cadena01,'G','G')<<endl;
-    cout<<markov_cont(cadena01,'G','T')<<endl;
-    cout<<"TTTT"<<endl;
-    cout<<markov_cont(cadena01,'T','A')<<endl;
-    cout<<markov_cont(cadena01,'T','C')<<endl;
-    cout<<markov_cont(cadena01,'T','G')<<endl;
-    cout<<markov_cont(cadena01,'T','T')<<endl;
-    
+    cout<<f_principl(cadena01,"ACGT")<<endl;
 	//ESCRIBIR en ARCHIVO
 	ofstream ficheroSalida;
 	ficheroSalida.open ("JMacetas_Practica06_C1.txt");
