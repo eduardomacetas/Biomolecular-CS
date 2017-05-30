@@ -7,10 +7,25 @@
 using namespace std;
 
 void llenar_datos(map<char,map<char, int> > &datos){
-	datos['A']['A'] =10;	datos['A']['G'] =-1;	datos['A']['C'] =-3;	datos['A']['T'] =-4;
-	datos['G']['A'] =-1;	datos['G']['G'] = 7;	datos['G']['C'] =-5;	datos['G']['T'] =-3;
-	datos['C']['A'] =-3;	datos['C']['G'] =-5;	datos['C']['C'] = 9;	datos['C']['T'] = 0;
-	datos['T']['A'] =-4;	datos['T']['G'] =-3;	datos['T']['C'] = 0;	datos['T']['T'] = 8;
+	datos['A']['A'] =10;	
+	datos['A']['G'] =-1;	
+	datos['A']['C'] =-3;	
+	datos['A']['T'] =-4;
+
+	datos['G']['A'] =-1;	
+	datos['G']['G'] = 7;	
+	datos['G']['C'] =-5;	
+	datos['G']['T'] =-3;
+
+	datos['C']['A'] =-3;	
+	datos['C']['G'] =-5;	
+	datos['C']['C'] = 9;	
+	datos['C']['T'] = 0;
+
+	datos['T']['A'] =-4;	
+	datos['T']['G'] =-3;	
+	datos['T']['C'] = 0;	
+	datos['T']['T'] = 8;
 }
 
 string obtener_cadena(vector<pair<char, char> >&alineados,bool pos){
@@ -26,8 +41,8 @@ string obtener_cadena(vector<pair<char, char> >&alineados,bool pos){
 		}
 		return cadena;
 	}
-
 }
+
 pair<string, string> needleman_wunch(string cad1, string cad2){
 	map<char,map<char, int> > datos;
 	llenar_datos(datos);
@@ -65,22 +80,6 @@ pair<string, string> needleman_wunch(string cad1, string cad2){
 		}
 	}
 
-	//mostraremos la matriz
-/*	cout<<"\t\t";
-	for (int i = 0; i < cad2.size(); ++i){
-		cout<<cad2[i]<<"\t";
-	}
-	cout<<endl;
-	cout<<"\t";
-	for (int i = 0; i < M.size(); ++i)
-	{
-		for (int j = 0; j < M[0].size(); ++j){
-			cout<<M[i][j]<<"\t";
-		}
-		cout<<endl;
-		cout<<cad1[i]<<"\t";
-	}
-*/
 	int i=M.size()-1;
 	int j=M[0].size()-1;
 	while(i>0 && j>0){
@@ -114,19 +113,18 @@ pair<string, string> needleman_wunch(string cad1, string cad2){
 			alineados.push_back(make_pair('-',cad2[k1-1]));
 		}
 	}
+	
 	/*
-	cout<<"\nALINEAMIENTO: "<<alineados.size()<<endl;
+	cout<<"ALINEAMIENTO: "<<endl;
 	
 	for (int i = 0; i < alineados.size(); ++i){
-		cout<<alineados[i].first<<"\t"<<alineados[i].second<<endl;
-	}
-	*/
+		cout<<alineados[i].first<<"  "<<alineados[i].second<<endl;
+	}*/
+	
 	reverse(alineados.begin(), alineados.end());
 	pair<string,string> ali;
 	ali =make_pair(obtener_cadena(alineados,0),obtener_cadena(alineados,1));
 	return ali;
-
-
 }
 
 int get_peso(string cad1,string cad2,int gap, int mismatch){
@@ -147,13 +145,12 @@ int get_peso(string cad1,string cad2,int gap, int mismatch){
 						tmp +=gap;
 				}
 				else tmp+=mismatch;
-
 			}
 		}
 		return tmp;
 	}
-
 }
+
 int get_peso2(char c1,char c2, int gap, int mismatch){
 	int tmp=0;
 	//primero -ultimo
@@ -169,10 +166,10 @@ int get_peso2(char c1,char c2, int gap, int mismatch){
 				tmp +=gap;
 		}
 		else tmp+=mismatch;
-
 	}
 	return tmp;
 }
+
 int get_peso3(char c1,char c2,char c3, int g,int m){
 	int tmp =0;
 	tmp +=get_peso2(c1,c3,g,m);
@@ -188,7 +185,8 @@ void crear_matriz(vector<string>&data,  pair<pair<string, string>, pair<int,int>
 		if(i != i_0 && i != i_1)
 		pos_fil =i; 
 	}
-	cout<<"\npos_fil: "<<pos_fil<<endl;
+	
+	//cout<<"\npos_fil: "<<pos_fil<<endl;
 
 	vector<vector<int> > M;
 	M.resize(data[pos_fil].size()+1);
@@ -222,51 +220,36 @@ void crear_matriz(vector<string>&data,  pair<pair<string, string>, pair<int,int>
 	for (int i = 1; i < M.size(); ++i){
 		for (int j = 1; j < M[0].size(); ++j){
 			
-
 			//int anterior_ =get_peso3(data[i_0][j-1],data[i_1][j-1],data[pos_fil][i-1],gap,mismatch);
 			int actual  =get_peso3(data[i_0][j],data[i_1][j],data[pos_fil][i],gap,mismatch);
-			//suma = M[i-1][j-1] + get_peso3(data[i_0][j],data[i_1][j],data[pos_fil][i-1],gap,mismatch);
-			//cout<<"\nsuma ="<<data[i_0][j]<<","<<data[pos_fil][i]<<" + "<<data[i_1][j]<<","<<data[pos_fil][i-1]<<" = "<<suma<<endl;
 			
-			//cout<<"\nAnteior: "<<anterior_<<endl;
-			//cout<<"\nActual: "<<actual_<<endl;
-			//suma =anterior_ + actual_;
 			res.push_back( actual+ M[i-1][j-1]);//diagonal
-			cout<<"\n\tDiagonal: "<<actual + M[i-1][j-1]<<endl;
+			//cout<<"\n\tDiagonal: "<<actual + M[i-1][j-1]<<endl;
 			
 			res.push_back(vacio + M[i-1][j]);//superior
-			cout<<"\tSuperior: "<<vacio + M[i-1][j]<<endl;
+			//cout<<"\tSuperior: "<<vacio + M[i-1][j]<<endl;
 			
 			res.push_back(vacio + M[i][j-1]);//izquierdo
-			cout<<"\tIzquierdo: "<<vacio + M[i][j-1]<<endl;
+			//cout<<"\tIzquierdo: "<<vacio + M[i][j-1]<<endl;
 			
 			sort(res.begin(), res.end());
-			for (int i = 0; i < res.size(); ++i){
+
+			/*for (int i = 0; i < res.size(); ++i){
 				cout<<res[i]<<"\t";
 			}
-			cout<<endl;
+			cout<<endl;*/
 			M[i][j] = res[0];
 			res.clear();		
 		}
 	}
 
-
-/*
-
-	M[1][1]= 0;	M[1][2]= 4;	M[1][3]= 8;	M[1][4]=12;	M[1][5]=16;	M[1][6]=20;
-	M[2][1]= 4;	M[2][2]= 3;	M[2][3]= 7;	M[2][4]= 8;	M[2][5]=12;	M[2][6]=16;
-	M[3][1]= 8;	M[3][2]= 7;	M[3][3]=9;	M[3][4]=12;	M[3][5]=14;	M[3][6]=18;
-	M[4][1]=12;	M[4][2]=11;	M[4][3]=7;	M[4][4]=11;	M[4][5]=15;	M[4][6]=14;
-	M[5][1]=16;	M[5][2]=15;	M[5][3]=11;	M[5][4]= 7;	M[5][5]=11;	M[5][6]=15;
-	M[6][1]=20;	M[6][2]=19;	M[6][3]=15;	M[6][4]=11;	M[6][5]=13;	M[6][6]=17;
-	M[7][1]=24;	M[7][2]=23;	M[7][3]=19;	M[7][4]=15;	M[7][5]=17;	M[7][6]=13;
-*/
 	for (int i = 0; i < M.size(); ++i){
 		for (int j = 0; j < M[i].size(); ++j){
 			cout<<M[i][j]<<"\t";	
 		}
 		cout<<endl;
 	}
+	
 	vacio =M[2][1];
 	vector<tuple<char, char, char>> progresive;
 	int i=M.size()-1;
@@ -281,10 +264,10 @@ void crear_matriz(vector<string>&data,  pair<pair<string, string>, pair<int,int>
 			c3 =data[pos_fil][i];
 			tuple<char,char,char> foo (c1,c2,c3);
 			progresive.push_back(foo);
-			cout<<"Diagonal: ("<<i<<","<<j<<")-> ";
+			//cout<<"D : ("<<i<<","<<j<<")-> ";
 			i--;
 			j--;
-			cout<<"("<<i<<","<<j<<")\n";
+			//cout<<"("<<i<<","<<j<<")\n";
 		}
 		else if(M[i][j]== (M[i][j-1] + vacio)){//izquierdo
 			c1 =data[i_0][j];
@@ -292,10 +275,10 @@ void crear_matriz(vector<string>&data,  pair<pair<string, string>, pair<int,int>
 			c3 =data[pos_fil][i];
 			tuple<char,char,char> foo(c1,c2,'-');
 			progresive.push_back(foo);
-			cout<<"Izquierdo: ("<<i<<","<<j<<")-> ";
+			//cout<<"I : ("<<i<<","<<j<<")-> ";
 			//alineados.push_back(make_pair('-',cad2[j-1]));
 			j--;
-			cout<<"("<<i<<","<<j<<")\n";
+			//cout<<"("<<i<<","<<j<<")\n";
 		}
 		else if(M[i][j]== (M[i-1][j]+vacio)){//superior
 			c1 =data[i_0][j];
@@ -303,12 +286,16 @@ void crear_matriz(vector<string>&data,  pair<pair<string, string>, pair<int,int>
 			c3 =data[pos_fil][i];
 			tuple<char,char,char> foo('-','-',c3);
 			progresive.push_back(foo);
-			cout<<"Superior: ("<<i<<","<<j<<")-> ";
+			//cout<<"S : ("<<i<<","<<j<<")-> ";
 			i--;
-			cout<<"("<<i<<","<<j<<")\n";
+			//cout<<"("<<i<<","<<j<<")\n";
 		}
-		cout<<endl;
+		//cout<<endl;
 	}
+		cout<<"======================================================="<<endl;
+	cout<<endl;
+	cout<<"ALINEACIONES:"<<endl;
+	cout<<"==========================================="<<endl;
 	reverse(progresive.begin(), progresive.end());
 	for(tuple<char, char, char> t: progresive)
 	{
@@ -325,19 +312,20 @@ void crear_matriz(vector<string>&data,  pair<pair<string, string>, pair<int,int>
 	    std::cout << std::get<0>(t) << ' ';
 	} 
 	cout<<endl;
-
-
+	cout<<"==========================================="<<endl;
+	cout<<endl;
 }
 
 
 void TPS(vector<string>&M, int gap,int mismatch){
-	cout<<"\nCADENAS INGRESADAS\n";
+	/* IMPRIME LAS CADENAS QUE HAN SIDO INGRESADAS:
+	cout<<"Cadenas Ingresadas"<<endl;
 	for (int i = 0; i < M.size(); ++i){
 		cout<<M[i]<<endl;
-	}
+	}*/
+
 	std::vector<pair<pair<string, string>, pair<int,int> > > v;//cadenas<>,posiciones<>
-	//int cant =M.size()*(M.size()-1)/2;
-	//v.resize(cant);
+
 	pair<string,string> tmp;
 	for (int i = 0; i < M.size(); ++i){
 		for (int j = i+1; j < M.size(); ++j){
@@ -345,6 +333,8 @@ void TPS(vector<string>&M, int gap,int mismatch){
 			v.push_back(make_pair(tmp,make_pair(i,j)) );
 		}
 	}
+	
+	cout<<"Alineacion de las cadenas: "<<endl;
 	for (int i = 0; i < v.size(); ++i){
 		cout<<i<<endl;
 		cout<<"\t"<<(v[i].first).first<<endl;
@@ -354,7 +344,9 @@ void TPS(vector<string>&M, int gap,int mismatch){
 	pair<pair<string, string>, pair<int,int> > par_menor =v[0];
 	pair<int, int >posiciones =v[0].second;
 	int min=get_peso((v[0].first).first, (v[0].first).second ,gap, mismatch);
-	cout<<"\nPESOS RESPECTIVOS\n";
+	
+	cout<<endl;
+	cout<<"Pesos "<<endl;
 	for (int i = 0; i < v.size(); ++i){
 		int peso =get_peso((v[i].first).first, (v[i].first).second ,gap, mismatch);
 		cout<<peso<<endl;
@@ -364,16 +356,17 @@ void TPS(vector<string>&M, int gap,int mismatch){
 			posiciones =v[i].second;
 		}
 	}
-	cout<<"\nPESO MENOR: "<<min<<" :: < "<<posiciones.first<<","<<posiciones.second<<" >\n";
+
+	//cout<<"\nPESO MENOR: "<<min<<" :: < "<<posiciones.first<<","<<posiciones.second<<" >\n";
+	cout<<endl;
+	cout<<"MATRIZ"<<endl;
+	cout<<"======================================================="<<endl;
 	crear_matriz(M,par_menor,gap,mismatch);	
-
 }
-
 
 
 int main(int argc, char const *argv[])
 {
-	//vector<pair<char,char> >alineados;
 	vector<string> M;
 	int gap,mismatch;
 	M.push_back("ACTCAT");
@@ -382,25 +375,8 @@ int main(int argc, char const *argv[])
 	mismatch =3;
 	gap =2;
 
-
-
 	TPS(M,gap,mismatch);
 
-/*
-	needleman_wunch(alineados,cad1,cad3);
-	reverse(alineados.begin(),alineados.end());
-	cout<<"\nALINEAMIENTO: "<<alineados.size()<<endl;
-	
-	for (int i = 0; i < alineados.size(); ++i)
-		cout<<alineados[i].first;
-	cout<<endl;
-	for (int i = 0; i < alineados.size(); ++i)
-		cout<<alineados[i].second;
-	
-*/
-
-
-	cout<<"\nEXITO\n";
 	return 0;
 }
 
