@@ -221,6 +221,7 @@ int eval_char(char c1,char c2, int match, int mismatch, int gap){
 	return tmp;	
 }
 
+//p_diagnal => de la diagonal
 int p_diagonal(vector<string>&data_f, vector<string>&data_c, int match, int mismatch, int gap, int posicion_i,int posicion_j){
 	int tmp=0;
 	for (int i = 0; i < data_c.size(); ++i){
@@ -232,6 +233,7 @@ int p_diagonal(vector<string>&data_f, vector<string>&data_c, int match, int mism
 	return tmp;
 }
 
+//p_izquierda => de la izquierda
 int p_izquierda(vector<string> &data_f, vector<string>&data_c, int match, int mismatch, int gap, int posicion){
 	int tmp=0;
 	for (int i = 0; i < data_f.size(); ++i){
@@ -243,6 +245,7 @@ int p_izquierda(vector<string> &data_f, vector<string>&data_c, int match, int mi
 	return tmp;
 }
 
+//p_arriba => de arriba
 int p_arriba(vector<string> &data_f, vector<string>&data_c, int match, int mismatch, int gap, int posicion){
 	int tmp=0;
 	for (int i = 0; i < data_f.size(); ++i){
@@ -254,7 +257,8 @@ int p_arriba(vector<string> &data_f, vector<string>&data_c, int match, int misma
 	return tmp;
 }
 
-//agregar --- guiones
+// agregar_guiones => funcion para agregar guiones
+// antes de hacer la alineación
 vector<string> agregar_guiones(vector<string> entrada){
 	std::vector<string> v;
 	for (int i = 0; i < entrada.size(); ++i){
@@ -269,87 +273,85 @@ void add_char_vec(vector<string> &v, int posicion,  char c){
 	v[posicion] += c;
 }
 
-// ALINEACION PARCIAL:
-
+// ALINEACION PARCIAL: es esta funcion lo que se hace es pasar 2 vectores <string>
 vector<string> alineacion_parcial(vector<string>data_f,vector<string>data_c, int mat, int mis, int gap ){
-	vector<vector<float> > M;//Matriz de alineaciones 
-	
+	vector<vector<float> > M; // Voy a guardar los pesos que me va a resultar 
 	M.resize(data_f[0].size()+1);
 	for (int i = 0; i < M.size(); ++i){
 		M[i].resize(data_c[0].size()+1);
 	}
-	//agregamos guiones a todas las matrices
-	vector<string> v_fila =agregar_guiones(data_f);
-	vector<string> v_col =agregar_guiones(data_c);
-	
 
-	cout<<"\nMOSTRAR FILAS\n";
+	// Utilizo mi funcion agregar_guiones => para agregar 
+	// guiones si es que falta
+	vector<string> v_fila = agregar_guiones(data_f);
+	vector<string> v_columna = agregar_guiones(data_c);
+	
+	cout<<"======================================"<<endl;
+	cout<<"Mostrar fila: "<<endl;
 	for (int i = 0; i < v_fila.size(); ++i)
 	{
 		cout<<v_fila[i]<<endl;
 	}
-	cout<<"\nMOSTRAR COLs\n";
-	for (int i = 0; i < v_col.size(); ++i)
+	//cout<<"======================================"<<endl;
+
+	//cout<<"======================================"<<endl;
+	cout<<"Mostrar Columna: "<<endl;
+	for (int i = 0; i < v_columna.size(); ++i)
 	{
-		cout<<v_col[i]<<endl;
+		cout<<v_columna[i]<<endl;
 	}
 	//cout<<"\n\tPeso: "<<get_peso("TGTAAC","TGT-AC",mat,mis,gap)<<endl;
+	cout<<"======================================"<<endl;
 	
-	//llenado de filas
+	// lleno las filas de mi matriz
 	for (int i = 0; i < M.size(); ++i){
-		M[i][0] =p_arriba(v_fila,v_col,mat,mis,gap,i);
+		M[i][0] =p_arriba(v_fila,v_columna,mat,mis,gap,i);
 	}
-	//llenado de columnas
+	// lleno las columnas de mi matriz
 	for (int i = 0; i < M[0].size(); ++i){
-		M[0][i] =p_izquierda(v_fila,v_col,mat,mis,gap,i);	
+		M[0][i] =p_izquierda(v_fila,v_columna,mat,mis,gap,i);	
 	}
 
-	
-	//llenado de la matriz a partir de la position 1
-	vector<float> res;//resulado de diagonal,superior,izquierdo
-	float diag,izq,sup,size_cad_f,size_cad_c;
+	// lleno la matriz desde 1
+	vector<float> res; // res=> voy a guardar el resultado de la diagonal, de arriba y de la izquierda
+	float diagonal,izquierda,arriba,size_cad_f,size_cad_c;
 	for (int i = 1; i < M.size(); ++i){
 		for (int j = 1; j < M[0].size(); ++j){
-			size_cad_f =v_fila.size();
-			size_cad_c =v_col.size();
-			float tam =1.0;
-			tam =size_cad_c + size_cad_f;
+			size_cad_f = v_fila.size();
+			size_cad_c = v_columna.size();
+			float tam = 1.0;
+			tam = size_cad_c + size_cad_f;
 
-			//int anterior_ =get_peso3(data[i_0][j-1],data[i_1][j-1],data[pos_fil][i-1],gap,mismatch);
-			diag  =p_diagonal(v_fila,v_col,mat,mis,gap,i,j)/tam;
-			izq   =p_izquierda(v_fila,v_col,mat,mis,gap,i)/tam;
-			sup   =p_arriba(v_fila,v_col,mat,mis,gap,j)/tam;
-			//get_peso3(data[i_0][j],data[i_1][j],data[pos_fil][i],gap,mismatch);
-			//suma = M[i-1][j-1] + get_peso3(data[i_0][j],data[i_1][j],data[pos_fil][i-1],gap,mismatch);
-			//cout<<"\nsuma ="<<data[i_0][j]<<","<<data[pos_fil][i]<<" + "<<data[i_1][j]<<","<<data[pos_fil][i-1]<<" = "<<suma<<endl;
-			
-			//cout<<"\nAnteior: "<<anterior_<<endl;
-			//cout<<"\ndiagonal: "<<diagonal_<<endl;
-			//suma =anterior_ + diagonal_;
-			res.push_back( diag+ M[i-1][j-1]);//diagonal
+			diagonal = p_diagonal(v_fila,v_columna,mat,mis,gap,i,j)/tam;
+			izquierda = p_izquierda(v_fila,v_columna,mat,mis,gap,i)/tam;
+			arriba = p_arriba(v_fila,v_columna,mat,mis,gap,j)/tam;
+
+			res.push_back(diagonal + M[i-1][j-1]); //para la diagonal
 			//cout<<"\n\tDiagonal: "<<diag<<" + "<< M[i-1][j-1]<<endl;
-			
-			res.push_back(sup + M[i-1][j]);//superior
+			res.push_back(arriba + M[i-1][j]); //para la de arriba
 			//cout<<"\tSuperior: "<<sup <<" + "<< M[i-1][j]<<endl;
-			
-			res.push_back(izq + M[i][j-1]);//izquierdo
+			res.push_back(izquierda + M[i][j-1]); //para la izquierda
 			//cout<<"\tIzquierdo: "<<izq <<" + "<< M[i][j-1]<<endl;
 			
+			// ordenar de menor a mayor con el sort
 			sort(res.begin(), res.end());
-	/*		
+			
+			/*
+			//imprime los pesos que tengo en res (diagonal, arriba e izquierda)
 			for (int i = 0; i < res.size(); ++i){
 				cout<<res[i]<<"\t";
 			}
 			cout<<endl;
-	*/
-			M[i][j] = res[res.size()-1];//escogemos al mayor
+			*/
+			
+			M[i][j] = res[res.size()-1]; //escogemos al mayor debido a que mi match es mayor
 			res.clear();
-			diag=izq=sup=0;	
+			diagonal = izquierda = arriba =
+			0;	
 		}
 	}
-	//cout<<"\n*****************ERROR******\n";
 	
-/*
+	/*
 	//mostramos las matrices
 	for (int i = 0; i < M.size(); ++i){
 		for (int j = 0; j < M[i].size(); ++j){
@@ -359,44 +361,43 @@ vector<string> alineacion_parcial(vector<string>data_f,vector<string>data_c, int
 	}*/
 
 
-
-	int i=M.size()-1;
-	int j=M[0].size()-1;
+	int i = M.size()-1;
+	int j = M[0].size()-1;
 	vector<string> result;//vector de cadenas resultantes;
-	result.resize(v_fila.size() + v_col.size());
+	result.resize(v_fila.size() + v_columna.size());
 	size_cad_f =v_fila.size();
-	size_cad_c =v_col.size();
+	size_cad_c =v_columna.size();
 	while(i>0 && j>0){
 		float tam =1.0;
 		tam =size_cad_c + size_cad_f;
 
-		diag  =p_diagonal(v_fila,v_col,mat,mis,gap,i,j)/tam;
-		izq   =p_izquierda(v_fila,v_col,mat,mis,gap,i)/tam;
-		sup   =p_arriba(v_fila,v_col,mat,mis,gap,j)/tam;
+		diagonal  = p_diagonal(v_fila,v_columna,mat,mis,gap,i,j)/tam;
+		izquierda = p_izquierda(v_fila,v_columna,mat,mis,gap,i)/tam;
+		arriba = p_arriba(v_fila,v_columna,mat,mis,gap,j)/tam;
 	
 		//cout<<"\n"<<i<<" : "<<j<<"\n";
-		if(M[i][j] == (diag +M[i-1][j-1])){//diagonal
-			//agregar columnas
+		if(M[i][j] == (diagonal + M[i-1][j-1])){// para la diagonal
+			// agregar las columnas:
 			for (int k1 = 0; k1 < size_cad_c; ++k1)
 			{
-				result[k1] += v_col[k1][j];
+				result[k1] += v_columna[k1][j];
 			}
-			//agregar filas
+			// agregar las filas:
 			for (int k2 = 0; k2 < size_cad_f; ++k2)
 			{
 				result[k2 + size_cad_c] +=v_fila[k2][i];
 			}
-			//alineados.push_back(make_pair(cad1[i-1],cad2[j-1]));
 			i--;
 			j--;
 		}
-		else if(M[i][j] ==(M[i-1][j] + sup)){//superior
-			//agregar columnas
+
+		else if(M[i][j] == (M[i-1][j] + arriba)){// para arriba
+			// agregas las columnas:
 			for (int k1 = 0; k1 < size_cad_c; ++k1)
 			{
 				result[k1] += '-';
 			}
-			//agregar filas
+			// agregar las filas:
 			for (int k2 = 0; k2 < size_cad_f; ++k2)
 			{
 				result[k2 + size_cad_c] +=v_fila[k2][i];
@@ -404,18 +405,18 @@ vector<string> alineacion_parcial(vector<string>data_f,vector<string>data_c, int
 			//alineados.push_back(make_pair(cad1[i-1],'-'));
 			i--;
 		}
-		else if(M[i][j] == (M[i][j-1] + izq)){//izquierda
-			//agregar columnas
+
+		else if(M[i][j] == (M[i][j-1] + izquierda)){// para la izquierda
+			// agregras las columnas
 			for (int k1 = 0; k1 < size_cad_c; ++k1)
 			{
-				result[k1] +=v_col[k1][j];
+				result[k1] +=v_columna[k1][j];
 			}
-			//agregar filas
+			// agregar las filas:
 			for (int k2 = 0; k2 < size_cad_f; ++k2)
 			{
 				result[k2 + size_cad_c] += '-';
 			}
-
 			//alineados.push_back(make_pair('-',cad2[j-1]));
 			j--;
 		}
@@ -425,38 +426,36 @@ vector<string> alineacion_parcial(vector<string>data_f,vector<string>data_c, int
 		//cout<<"\nValor i: "<<i<<endl;
 		for (int i_1 = i; i_1 > 0; --i_1){
 
-			//agregar columnas
+			// agregar las columnas:
 			for (int k1 = 0; k1 < size_cad_c; ++k1){
 				result[k1] += '-';
 			}
-			//agregar filas
+			// agregar las filas:
 			for (int k2 = 0; k2 < size_cad_f; ++k2){
 				result[k2 + size_cad_c] +=v_fila[k2][i_1];
 			}
 			//alineados.push_back(make_pair(cad1[i-1],'-'));
 			//i--;
 			if(i==0) break;
-
 		}
 	}
 	if(j>0){
 		//cout<<"\nValor j: "<<j<<endl;
 		for (int j_1 = j; j_1 > 0; --j_1){
-			//agregar columnas
+			// agregar las columnas:
 			for (int k1 = 0; k1 < size_cad_c; ++k1)
 			{
-				result[k1] += v_col[k1][j_1];
+				result[k1] += v_columna[k1][j_1];
 			}
-			//agregar filas
+			// agregar las filas:
 			for (int k2 = 0; k2 < size_cad_f; ++k2)
 			{
 				result[k2 + size_cad_c] += '-';
 			}
-
 			//alineados.push_back(make_pair('-',cad2[j-1]));
 		}
 	}
-	cout<<"\nMOSTRAR RESULTADOS:\n";
+	cout<<" Alineaciones:  "<<endl;
 	for (int i = 0; i <result.size() ; ++i){
 		reverse(result[i].begin(), result[i].end());
 	}
@@ -465,102 +464,86 @@ vector<string> alineacion_parcial(vector<string>data_f,vector<string>data_c, int
 		cout<<result[i]<<endl;
 	}
 	return result;
-
 }
 
 
-/// ALINEACION:
+/// ALINEACION DIRECTA: en esta parte voy a comparar 2 string y sacar su peso
 
-void alineacion(vector<string> data,int mat, int mis, int gap){
+void alineacion(vector<string> entrada,int mat, int mis, int gap){
 	pair<string, string> cads_n_w;
-	float peso=0;
-	//multimap<float, tuple<int, string, int, string> > resultados;
-	multimap<float, pair<int, int> > result;
+	float peso = 0.0;
 
+	multimap<float, pair<int, int> > result; // Multimap (key, tupla) result
 
-	for (int i = 0; i < data.size(); ++i){
-		for (int j = i+1; j < data.size(); ++j){
+	// dos fors para hacer las comparaciones de 0-1, 0-2 ...
+	cout<<" Todas las comparaciones:"<<endl;
+	cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
+	for (int i = 0; i < entrada.size(); ++i){
+		for (int j = i+1; j < entrada.size(); ++j){
 			cout<<i<<","<<j<<endl;
-			cads_n_w =alineacion_directa(data[i],data[j]);
-			peso = sum_cadenas(cads_n_w.first, cads_n_w.second,mat,mis,gap)*1.0/(cads_n_w.first).size();
-			cout<<"\t"<<cads_n_w.first<<endl;
-			cout<<"\t"<<cads_n_w.second<<endl;
-			cout<<"\tPeso: "<<peso<<endl;
-			//resultados.insert(make_pair(peso, make_tuple(i,cads_n_w.first, j,cads_n_w.second)) );
+			cads_n_w = alineacion_directa(entrada[i],entrada[j]);
+			peso = sum_cadenas(cads_n_w.first, cads_n_w.second,mat,mis,gap)*1.0/(cads_n_w.first).size(); // obtengo el peso de comparacion
+			cout<<cads_n_w.first<<"    ,   "<<"\t"<<cads_n_w.second<<endl;
+			cout<<"COMPARACION: "<<peso<<endl;
 			result.insert(make_pair(peso,make_pair(i,j)));
-			//cout<<endl;
+			cout<<endl;
 		}
 	}
-/*
-	//Muestra resultados
-	for (auto &it:resultados){
-		tuple<int, string,int,string> t =(it.second);
-	    cout<<get<0>(t) <<","<<get<2>(t) <<endl;
-	    cout<<"\t"<<get<1>(t) <<endl;
-	    cout<<"\t"<<get<3>(t) <<endl;
-		cout<<"\tPeso:"<<(it).first<<endl;
-	    cout<<endl;
-	}
-*/
+	cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
+	cout<<endl;
+	cout<<endl;
+	cout<<endl;
+	
 	vector<pair<int,int> > v_position;
 	std::multimap<float,pair<int,int> >::reverse_iterator it;
   	for (it=result.rbegin(); it!=result.rend(); ++it){
-    //std::cout << it->first << " => " << it->second << '\n';
-		/*
-		cout<<(it->second).first<<","<<(it->second).second;
-		cout<<"\tPeso: "<<it->first<<endl;
-		cout<<endl;
-		*/
-
 		v_position.push_back(make_pair((it->second).first, (it->second).second));
-
 	}
-	ordenar_parejas(v_position, data.size());
-	cout<<"\nRESULTADO 2\n";
+
+	ordenar_parejas(v_position, entrada.size());
+	cout<<" El vs entre cadenas:"<<endl;
+	cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	for (int i = 0; i < v_position.size(); ++i){
-		cout<<v_position[i].first<<","<<v_position[i].second<<"\t";
+		cout<<v_position[i].first<<"  VS  "<<v_position[i].second<<"\t";
 	}
 	cout<<endl;
+	cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 
 	vector<vector<string> > all_alineacion;//contiene a todas las alineaciones
-	//all_alineacion.resize(v_position.size());
-	
 	vector<string> vec;
-	//alinearemos todos vs todos NW
+
+	// Alinear todos VS todos 
 	for (int i = 0; i < v_position.size(); ++i){
-		cads_n_w =needleman_wunch(data[v_position[i].first], data[v_position[i].second]);
+		cads_n_w =needleman_wunch(entrada[v_position[i].first], entrada[v_position[i].second]);
 		vec.push_back(cads_n_w.first);
-		if(cads_n_w.first != cads_n_w.second )//si no se repiten agrego
-			vec.push_back(cads_n_w.second);
-		
+		if(cads_n_w.first != cads_n_w.second ) // si son diferentes los agrego
+			vec.push_back(cads_n_w.second);		
 		all_alineacion.push_back(vec);
 		vec.clear();
 	}
 	vec.clear();
-	//mostrar todas las all_alineaciones
+
+	// Imprimo todas las alineaciones... que guarde en all_alineacion
+	// es decir los versus que tenia mas arriba
 	for (int i = 0; i < all_alineacion.size(); ++i){
-		cout<<"\n"<<i<<endl;
+		//cout<<"\n"<<i<<endl;
+		cout<<"este es el # "<<i<<":"<<endl;
 		vec =all_alineacion[i];
 		for (int j = 0; j < vec.size(); ++j){
-			cout<<"\t"<<vec[j]<<endl;
+			cout<<vec[j]<<endl;
 		}
 		cout<<endl;
 	}
 
-
 	vec.clear();
-	vec =all_alineacion[0];//el ultimo elemento por el pusch_back
-	cout<<"\nTamanio_all_alineaciones: "<<all_alineacion.size()<<endl;
+	// el ultimo alineamiento va a ir solo, por eso le hago un push_back
+	vec = all_alineacion[0];
+	//cout<<"Cuanto # tiee mi all_alineacion: "<<all_alineacion.size()<<endl;
 	int i = 1;
 	for (int i = 1; i < all_alineacion.size(); ++i){
 		vec = alineacion_parcial(all_alineacion[i],vec,mat,mis,gap);
 	}
-	//vec = alineacion_parcial(all_alineacion[i],vec,mat,mis,gap);
-	
-/*	for (int i = all_alineacion.size()-2; i >=0; ++i){
-		alineacion_parcial(vec, all_alineacion[i],mat,mis,gap);
-	}
-*/
+
 }
 
 
